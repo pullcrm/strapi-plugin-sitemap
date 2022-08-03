@@ -37,7 +37,7 @@ const getAllowedFields = async (contentType) => {
  * @returns {array} The fields.
  */
 const getFieldsFromPattern = (pattern) => {
-  let fields = pattern.match(/[[\w\d]+]/g); // Get all substrings between [] as array.
+  let fields = pattern.match(/\[(.*?)\]/g); // Get all substrings between [] as array.
   fields = fields.map((field) => RegExp(/(?<=\[)(.*?)(?=\])/).exec(field)[0]); // Strip [] from string.
   return fields;
 };
@@ -54,7 +54,7 @@ const resolvePattern = async (pattern, entity) => {
   const fields = getFieldsFromPattern(pattern);
 
   fields.map((field) => {
-    pattern = pattern.replace(`[${field}]`, entity[field] || '');
+    pattern = pattern.replace(`[${field}]`, field.split('.').reduce((acc, item) => acc[item], entity) || '');
   });
 
   pattern = pattern.replace(/([^:]\/)\/+/g, "$1"); // Remove duplicate forward slashes.
@@ -99,7 +99,7 @@ const validatePattern = async (pattern, allowedFieldNames) => {
 
   let fieldsAreAllowed = true;
   getFieldsFromPattern(pattern).map((field) => {
-    if (!allowedFieldNames.includes(field)) fieldsAreAllowed = false;
+    if (!allowedFieldNames.includes(field.split('.')[0])) fieldsAreAllowed = false;
   });
 
   if (!fieldsAreAllowed) {

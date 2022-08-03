@@ -158,7 +158,7 @@ const createSitemapEntries = async () => {
         } : {},
       },
       orderBy: 'id',
-      populate: ['localizations'],
+      populate: ['localizations', 'category'], // TODO: Add new property to expand populate
     });
 
     // Add formatted sitemap page data to the array.
